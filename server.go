@@ -47,6 +47,6 @@ package main
      // HTTPではLine APIを利用できないため、HTTPSに変更する
      // CERT_FILEとKEY_FILEはSSL証明書を発行した後に書き換える
      if err := http.ListenAndServeTLS(":443", "CERT_FILE", "KEY_FILE", nil); err != nil {
-         logger.Fatal("ListenAndServe: ", err)
+         log.Fatal("ListenAndServe: ", err)
      }
  }
