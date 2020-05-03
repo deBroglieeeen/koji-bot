@@ -1,0 +1,19 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "jMTWbLHcSKThVxxhSHvYMgKAsa0=",
+			"path": "github.com/line/line-bot-sdk-go/linebot",
+			"revision": "4d6ce6da83cf252311e85e7535a97f40f153cfb5",
+			"revisionTime": "2020-04-22T08:41:21Z"
+		},
+		{
+			"checksumSHA1": "/+t/C0L81jgAfZCn1wCrF/1+8yw=",
+			"path": "github.com/line/line-bot-sdk-go/linebot/httphandler",
+			"revision": "4d6ce6da83cf252311e85e7535a97f40f153cfb5",
+			"revisionTime": "2020-04-22T08:41:21Z"
+		}
+	],
+	"rootPath": "github.com/deBroglieeeen/koji-bot"
+}
