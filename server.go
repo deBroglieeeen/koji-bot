@@ -41,9 +41,9 @@ package main
      })
      http.Handle("/callback", handler)
 
-     //if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
-     //  log.Fatal(err)
-     //}
+     if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
+      log.Fatal(err)
+     }
 
      // HTTPではLine APIを利用できないため、HTTPSに変更する
      // CERT_FILEとKEY_FILEはSSL証明書を発行した後に書き換える
