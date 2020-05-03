@@ -20,6 +20,7 @@ func main() {
 
 	// Setup HTTP Server for receiving requests from LINE platform
 	http.HandleFunc("/callback", func(w http.ResponseWriter, req *http.Request) {
+		log.Print("コールバックまではきています")
 		events, err := bot.ParseRequest(req)
 		if err != nil {
 			if err == linebot.ErrInvalidSignature {
