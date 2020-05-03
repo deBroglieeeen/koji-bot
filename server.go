@@ -23,6 +23,7 @@ func main() {
 		events, err := bot.ParseRequest(req)
 		if err != nil {
 			if err == linebot.ErrInvalidSignature {
+				log.Print("証明に失敗しています")
 				w.WriteHeader(400)
 			} else {
 				w.WriteHeader(500)
