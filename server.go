@@ -1,53 +1,55 @@
 package main
 
- import (
-     "log"
-     "net/http"
-     "os"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 
-     "github.com/line/line-bot-sdk-go/linebot"
-     "github.com/line/line-bot-sdk-go/linebot/httphandler"
- )
+	"github.com/line/line-bot-sdk-go/linebot"
+)
 
- func main() {
+func main() {
+	bot, err := linebot.New(
+		os.Getenv("CHANNEL_SECRET"),
+		os.Getenv("CHANNEL_TOKEN"),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-     // CHANNEL_SECRETとCHANNEL_TOKENはLine Developersから取得できる
-     handler, err := httphandler.New(
-         os.Getenv("CHANNEL_SECRET"),
-         os.Getenv("CHANNEL_TOKEN"),
-     )
-     if err != nil {
-         log.Fatal(err)
-     }
-
-     // Setup HTTP Server for receiving requests from LINE platform
-     handler.HandleEvents(func(events []*linebot.Event, r *http.Request) {
-         bot, err := handler.NewClient()
-         if err != nil {
-             log.Print(err)
-             return
-         }
-         for _, event := range events {
-             if event.Type == linebot.EventTypeMessage {
-                 switch message := event.Message.(type) {
-                 case *linebot.TextMessage:
-                     if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
-                         log.Print(err)
-										 }
-
-                 }
-             }
-         }
-     })
-     http.Handle("/callback", handler)
-
-     if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
-      log.Fatal(err)
-     }
-
-     // HTTPではLine APIを利用できないため、HTTPSに変更する
-     // CERT_FILEとKEY_FILEはSSL証明書を発行した後に書き換える
-    //  if err := http.ListenAndServeTLS(":443", "CERT_FILE", "KEY_FILE", nil); err != nil {
-    //      log.Fatal("ListenAndServe: ", err)
-    //  }
- }
+	// Setup HTTP Server for receiving requests from LINE platform
+	http.HandleFunc("/callback", func(w http.ResponseWriter, req *http.Request) {
+		events, err := bot.ParseRequest(req)
+		if err != nil {
+			if err == linebot.ErrInvalidSignature {
+				w.WriteHeader(400)
+			} else {
+				w.WriteHeader(500)
+			}
+			return
+		}
+		for _, event := range events {
+			if event.Type == linebot.EventTypeMessage {
+				switch message := event.Message.(type) {
+				case *linebot.TextMessage:
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
+						log.Print(err)
+					}
+				case *linebot.StickerMessage:
+					replyMessage := fmt.Sprintf(
+						"sticker id is %s, stickerResourceType is %s", message.StickerID, message.StickerResourceType)
+				  log.Print(replyMessage)
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
+						log.Print(err)
+					}
+				}
+			}
+		}
+	})
+	// This is just sample code.
+	// For actual use, you must support HTTPS by using `ListenAndServeTLS`, a reverse proxy or something else.
+	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
+		log.Fatal(err)
+	}
+}
